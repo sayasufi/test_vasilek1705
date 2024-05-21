@@ -1,46 +1,5 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Документация по FastAPI-Redis сервису</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #000;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2, h3, h4, p, code, pre {
-            color: #000;
-        }
-        code {
-            background: #eee;
-            padding: 2px 5px;
-            border-radius: 4px;
-        }
-        pre {
-            background: #eee;
-            padding: 10px;
-            border-radius: 4px;
-            overflow-x: auto;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #000;
-        }
-    </style>
-</head>
 <body>
     <div class="container">
         <h1>Документация по FastAPI-Redis сервису</h1>
