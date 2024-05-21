@@ -2,7 +2,7 @@
 <html lang="ru">
 <body>
     <div class="container">
-        <h1>Документация по FastAPI-Redis сервису</h1>
+        <h1>Задание 1. Документация по FastAPI-Redis сервису</h1>
         <p>Добро пожаловать в сервис FastAPI-Redis! Данный документ содержит полное руководство по использованию и функционалу приложения.</p>
         <h2>Запуск проекта</h2>
         <p>Для запуска проекта вам понадобятся Docker и Docker Compose. Выполните следующие шаги:</p>
@@ -51,5 +51,56 @@
 ├── requirements.txt
 └── docker-compose.yml</code></pre>
     </div>
+<h1>Решение задачи по переносу данных в СУБД Postgres</h1>
+    <p>У нас есть две таблицы в базе данных Postgres:</p>
+    <ul>
+        <li><strong>short_names</strong> с 700,000 записями, содержащая имена файлов без расширений и их статус.</li>
+        <li><strong>full_names</strong> с 500,000 записями, содержащая имена файлов с расширениями.</li>
+    </ul>
+    <p>Необходимо перенести статус файлов из таблицы <strong>short_names</strong> в таблицу <strong>full_names</strong> с минимальным количеством запросов и за максимально короткое время. Рассмотрим два варианта решения задачи.</p>
+    <h2>Вариант 1: Использование UPDATE с подзапросом</h2>
+    <pre><code>
+UPDATE full_names
+SET status = short_names.status
+FROM short_names
+WHERE full_names.name LIKE short_names.name || '%';
+    </code></pre>
+    <p><strong>Объяснение:</strong></p>
+    <ul>
+        <li>Запрос обновляет таблицу <code>full_names</code>.</li>
+        <li>Используется <code>SET status = short_names.status</code> для установки нового значения столбца <code>status</code>.</li>
+        <li><code>FROM short_names</code> подключает таблицу <code>short_names</code>.</li>
+        <li>Условие <code>WHERE full_names.name LIKE short_names.name || '%'</code> проверяет, что имена файлов совпадают, игнорируя расширения.</li>
+    </ul>
+    <h2>Вариант 2: Использование временной таблицы</h2>
+    <pre><code>
+-- Создание временной таблицы с данными о статусе
+CREATE TEMP TABLE temp_full_names AS
+SELECT f.name, f.status AS full_status, s.status AS short_status
+FROM full_names f
+JOIN short_names s ON f.name LIKE s.name || '%';
+
+-- Обновление статусов в основной таблице
+UPDATE full_names
+SET status = temp_full_names.short_status
+FROM temp_full_names
+WHERE full_names.name = temp_full_names.name;
+    </code></pre>
+    <p><strong>Объяснение:</strong></p>
+    <ul>
+        <li><strong>Создание временной таблицы:</strong></li>
+        <ul>
+            <li>Временная таблица <code>temp_full_names</code> создается на основе объединения данных из <code>full_names</code> и <code>short_names</code>.</li>
+            <li><code>JOIN</code> используется для объединения строк, где <code>full_names.name</code> начинается с <code>short_names.name</code>.</li>
+        </ul>
+        <li><strong>Обновление основной таблицы:</strong></li>
+        <ul>
+            <li>В этом запросе используется временная таблица для обновления статусов в основной таблице <code>full_names</code>.</li>
+            <li><code>SET status = temp_full_names.short_status</code> обновляет столбец <code>status</code> в <code>full_names</code>.</li>
+        </ul>
+    </ul>
+    <h2>Заключение</h2>
+    <p>Оба варианта имеют свои преимущества. Первый вариант прост и эффективен, так как использует всего один запрос, но может занять больше времени на выполнение. Второй вариант более сложен, так как требует создания временной таблицы, но может быть более эффективным с точки зрения производительности, особенно если временная таблица индексирована.</p>
+    <p>Оба варианта должны быть протестированы и оптимизированы для конкретной базы данных и окружения, чтобы выбрать наиболее эффективный подход.</p>
 </body>
 </html>
